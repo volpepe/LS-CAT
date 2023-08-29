@@ -18,20 +18,36 @@ class main_skeleton():
                 "using namespace std::chrono;",
                 "int blocks_[20][2] = {{8,8},{16,16},{24,24},{32,32},{1,64},{1,128},{1,192},{1,256},{1,320},{1,384},{1,448},{1,512},{1,576},{1,640},{1,704},{1,768},{1,832},{1,896},{1,960},{1,1024}};",
                 "int matrices_[7][2] = {{240,240},{496,496},{784,784},{1016,1016},{1232,1232},{1680,1680},{2024,2024}};"]
-        self.main = ["int main(int argc, char **argv) {","cudaSetDevice(0); ",
-                "char* p;int matrix_len=strtol(argv[1], &p, 10);",
-                "for(int matrix_looper=0;matrix_looper<matrix_len;matrix_looper++){",
-                "for(int block_looper=0;block_looper<20;block_looper++){",
-                "int XSIZE=matrices_[matrix_looper][0],YSIZE=matrices_[matrix_looper][1],BLOCKX=blocks_[block_looper][0],BLOCKY=blocks_[block_looper][1];"]
+        
+        self.main = ["int main(int argc, char **argv) {",
+                        "cudaSetDevice(0); ",
+                        "char* p;int matrix_len=strtol(argv[1], &p, 10);",
+                        "for(int matrix_looper=0;matrix_looper<matrix_len;matrix_looper++){",
+                            "for(int block_looper=0;block_looper<20;block_looper++){",
+                                "int XSIZE=matrices_[matrix_looper][0],YSIZE=matrices_[matrix_looper][1],BLOCKX=blocks_[block_looper][0],BLOCKY=blocks_[block_looper][1];"]
 
         self.variables = []
 
-        self.thread_dims = ["int iXSIZE=XSIZE;","int iYSIZE=YSIZE;","while(iXSIZE%BLOCKX!=0)","{","iXSIZE++;","}","while(iYSIZE%BLOCKY!=0)","{"," iYSIZE++;","}","dim3 gridBlock(iXSIZE/BLOCKX, iYSIZE/BLOCKY);","dim3 threadBlock(BLOCKX, BLOCKY);"]
+        self.thread_dims = ["int iXSIZE=XSIZE;",
+                            "int iYSIZE=YSIZE;",
+                            "while(iXSIZE%BLOCKX!=0)",
+                            "{",
+                                "iXSIZE++;",
+                            "}",
+                            "while(iYSIZE%BLOCKY!=0)",
+                            "{",
+                                " iYSIZE++;",
+                            "}",
+                            "dim3 gridBlock(iXSIZE/BLOCKX, iYSIZE/BLOCKY);",
+                            "dim3 threadBlock(BLOCKX, BLOCKY);"]
 
 
         self.function_call = []
 
-        self.end = ["}","auto end = steady_clock::now();","auto usecs = duration_cast<duration<float, microseconds::period> >(end - start);","cout <<'['<<usecs.count()<<','<<'('<<BLOCKX<<','<<BLOCKY<<')' << ','<<'('<<XSIZE<<','<<YSIZE<<')'<<']' << endl;"]
+        self.end = ["}",
+                    "auto end = steady_clock::now();",
+                    "auto usecs = duration_cast<duration<float, microseconds::period> >(end - start);",
+                    "cout <<'['<<usecs.count()<<','<<'('<<BLOCKX<<','<<BLOCKY<<')' << ','<<'('<<XSIZE<<','<<YSIZE<<')'<<']' << endl;"]
 
         self.variable_names = []
 
@@ -52,13 +68,12 @@ class main_skeleton():
     def add_variables(self,function_name:str, variables:list):
         for var in variables:
             v=var[0]
-            if v.find('*')!=-1:
+            if v.find('*')!=-1:         # Pointers become null pointers, but we allocate some memory
                 self.variables.append(v+var[1]+" = NULL;")
                 self.variable_names.append(var[1])
                 self.variables.append("cudaMalloc(&"+var[1]+", XSIZE*YSIZE);")
                 #self.end.append("cudaFree("+var[1]+");")
             else:
-
                 self.variable_names.append(var[1])
                 self.variables.append(v+" "+var[1]+" =  XSIZE*YSIZE;")
 
