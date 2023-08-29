@@ -8,7 +8,7 @@ from tqdm import tqdm
 # NOTE: sm_52 reflects the T4 results
 
 data_path = "data/"
-compilation_command = "clang++-10 {} -pthread --cuda-path=/usr/lib/cuda/w -gencode=arch=compute_52,code=sm_52 -std=c++11 -fno-exceptions -stdlib=libstdc++ -S -emit-llvm -O3 --cuda-device-only -o {}"
+compilation_command = "clang++-10 {} -pthread --cuda-path=/usr/lib/cuda --cuda-gpu-arch=sm_52 -std=c++11 -fno-exceptions -stdlib=libstdc++ -S -emit-llvm -O3 --cuda-device-only -o {}"
 
 if __name__ == '__main__':
 
