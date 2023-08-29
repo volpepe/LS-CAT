@@ -35,3 +35,6 @@ if __name__ == '__main__':
 
     print(f"Compiled {num_kernels - len(errors)}/{num_kernels} LS-CAT kernels")
     print(f"{len(errors)} errors at {errors}")
+    
+    with open('compilation_errors.txt', 'w') as f:
+        f.writelines([e + '\n' for e in errors])
